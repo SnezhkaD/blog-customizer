@@ -1,18 +1,14 @@
 import clsx from 'clsx';
 
-
+// Сообщаем вебпаку, что этот файл использует это изображение.
 import plane from 'src/images/plane.png';
 import { Text } from 'components/text';
-import { OnClick } from '../arrow-button/ArrowButton';
+
 import styles from './Article.module.scss';
 
-interface ArticleProps {
-	handleCloseMenu: OnClick;
-}
-
-export const Article = ({ handleCloseMenu }: ArticleProps) => {
+export const Article = () => {
 	return (
-		<article className={clsx(styles.article)} onClick={handleCloseMenu}>
+		<article className={clsx(styles.article)}>
 			<Text as='h1' size={45} weight={800} uppercase dynamicLite>
 				Портрет Западной Швейцарии
 			</Text>
