@@ -4,14 +4,12 @@ import { Button } from 'components/button';
 import styles from './ArticleParamsForm.module.scss';
 
 import clsx from 'clsx';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 import { Text } from '../text';
 import { Select } from '../select';
 import { RadioGroup } from '../radio-group';
 import { Separator } from '../separator';
-
-import { OnClick } from '../arrow-button/ArrowButton';
 
 import {
 	OptionType,
@@ -25,22 +23,24 @@ import {
 } from 'src/constants/articleProps';
 
 interface ArticleParamsFormProps {
-	handleClick: OnClick;
-	state: boolean;
 	setAppState: React.Dispatch<React.SetStateAction<ArticleStateType>>;
 }
 
-export const ArticleParamsForm = ({
-	handleClick,
-	state,
-	setAppState,
-}: ArticleParamsFormProps) => {
+export const ArticleParamsForm = ({ setAppState }: ArticleParamsFormProps) => {
 	const [formState, setFormState] =
 		useState<ArticleStateType>(defaultArticleState);
+
+	const [isActive, setIsActive] = useState(false);
+
+	const formRef = useRef<HTMLDivElement>(null);
 
 	const handleSubmit = () => {
 		setFormState(defaultArticleState);
 		setAppState(defaultArticleState);
+	};
+
+	const handleClick = () => {
+		setIsActive((oldVal) => !oldVal);
 	};
 
 	const handleReset = (evt: React.SyntheticEvent) => {
@@ -57,13 +57,27 @@ export const ArticleParamsForm = ({
 		};
 	};
 
+	useEffect(() => {
+		const handleClickOutside = (event: MouseEvent) => {
+			if (formRef.current && !formRef.current.contains(event.target as Node)) {
+				setIsActive(false);
+			}
+		};
+
+		document.addEventListener('mousedown', handleClickOutside);
+		return () => {
+			document.removeEventListener('mousedown', handleClickOutside);
+		};
+	}, []);
+
 	return (
 		<>
-			<ArrowButton handleClick={handleClick} state={state} />
+			<ArrowButton handleClick={handleClick} state={isActive} />
 			<aside
+				ref={formRef}
 				className={clsx({
 					[styles.container]: true,
-					[styles.container_open]: state,
+					[styles.container_open]: isActive,
 				})}>
 				<form className={styles.form} onSubmit={handleReset}>
 					<Text as='h1' size={31} weight={800} uppercase>
@@ -110,17 +124,3 @@ export const ArticleParamsForm = ({
 		</>
 	);
 };
-// 	return (
-// 		<>
-// 			<ArrowButton />
-// 			<aside className={styles.container}>
-// 				<form className={styles.form}>
-// 					<div className={styles.bottomContainer}>
-// 						<Button title='Сбросить' type='reset' />
-// 						<Button title='Применить' type='submit' />
-// 					</div>
-// 				</form>
-// 			</aside>
-// 		</>
-// 	);
-// };
